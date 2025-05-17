@@ -1,0 +1,115 @@
+
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useRoom } from '@/contexts/RoomContext';
+
+export const Header: React.FC = () => {
+  const { currentUser, signInWithGoogle, signOut } = useAuth();
+  const { roomId, joinRoom, leaveRoom, isConnected, participants } = useRoom();
+  const [newRoomId, setNewRoomId] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleCreateRoom = () => {
+    // Generate a random room ID
+    const randomId = Math.random().toString(36).substring(2, 10);
+    joinRoom(randomId);
+    setDialogOpen(false);
+  };
+
+  const handleJoinRoom = () => {
+    if (newRoomId.trim()) {
+      joinRoom(newRoomId.trim());
+      setDialogOpen(false);
+    }
+  };
+
+  return (
+    <header className="bg-background border-b border-border py-4">
+      <div className="container flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-bold">CodeCompiler</h1>
+          {isConnected && (
+            <div className="flex gap-2 items-center">
+              <span className="bg-green-500 text-white px-2 py-0.5 text-xs rounded-full">
+                Room: {roomId}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {participants.length} participant{participants.length !== 1 ? 's' : ''}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {isConnected ? (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="text-red-500" 
+              onClick={leaveRoom}
+            >
+              Leave Room
+            </Button>
+          ) : (
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">Collaborate</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Start Collaboration</DialogTitle>
+                  <DialogDescription>
+                    Create a new room or join an existing one to collaborate in real-time.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="roomId" className="text-right">
+                      Room ID
+                    </Label>
+                    <Input
+                      id="roomId"
+                      value={newRoomId}
+                      onChange={(e) => setNewRoomId(e.target.value)}
+                      placeholder="Enter room ID"
+                      className="col-span-3"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={handleCreateRoom}>
+                    Create New Room
+                  </Button>
+                  <Button onClick={handleJoinRoom}>Join Room</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+          
+          {currentUser ? (
+            <div className="flex items-center gap-2">
+              <img 
+                src={currentUser.photoURL || undefined}
+                alt={currentUser.displayName || 'User'}
+                className="w-8 h-8 rounded-full"
+              />
+              <div className="hidden md:block text-sm">
+                {currentUser.displayName}
+              </div>
+              <Button variant="ghost" size="sm" onClick={signOut}>
+                Sign Out
+              </Button>
+            </div>
+          ) : (
+            <Button onClick={signInWithGoogle}>
+              Sign in with Google
+            </Button>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+};
