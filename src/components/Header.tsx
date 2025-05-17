@@ -6,10 +6,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRoom } from '@/contexts/RoomContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Moon, Sun } from 'lucide-react';
+import { Toggle } from '@/components/ui/toggle';
 
 export const Header: React.FC = () => {
   const { currentUser, signInWithGoogle, signOut } = useAuth();
   const { roomId, joinRoom, leaveRoom, isConnected, participants } = useRoom();
+  const { theme, toggleTheme } = useTheme();
   const [newRoomId, setNewRoomId] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -44,6 +48,17 @@ export const Header: React.FC = () => {
           )}
         </div>
         <div className="flex items-center gap-2">
+          {/* Theme Toggle Button */}
+          <Toggle 
+            variant="outline"
+            size="sm"
+            pressed={theme === 'dark'}
+            onPressedChange={toggleTheme}
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
+          </Toggle>
+          
           {isConnected ? (
             <Button 
               variant="outline" 
