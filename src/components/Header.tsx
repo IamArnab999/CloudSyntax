@@ -56,7 +56,7 @@ export const Header: React.FC = () => {
             onPressedChange={toggleTheme}
             aria-label="Toggle theme"
           >
-            {theme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}
+            {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
           </Toggle>
           
           {isConnected ? (
