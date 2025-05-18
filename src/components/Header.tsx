@@ -9,13 +9,15 @@ import { useRoom } from '@/contexts/RoomContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Moon, Sun } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const Header: React.FC = () => {
-  const { currentUser, signIn, signOut } = useAuth();
+  const { currentUser, signOut } = useAuth();
   const { roomId, joinRoom, leaveRoom, isConnected, participants } = useRoom();
   const { theme, toggleTheme } = useTheme();
   const [newRoomId, setNewRoomId] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleCreateRoom = () => {
     // Generate a random room ID
@@ -31,11 +33,21 @@ export const Header: React.FC = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  const handleNavigateToAuth = () => {
+    navigate('/auth');
+  };
+
   return (
     <header className="bg-background border-b border-border py-4">
       <div className="container flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <h1 className="text-xl font-bold">CodeCompiler</h1>
+          <Link to="/">
+            <h1 className="text-xl font-bold">CodeCompiler</h1>
+          </Link>
           {isConnected && (
             <div className="flex gap-2 items-center">
               <span className="bg-green-500 text-white px-2 py-0.5 text-xs rounded-full">
@@ -107,19 +119,19 @@ export const Header: React.FC = () => {
           {currentUser ? (
             <div className="flex items-center gap-2">
               <img 
-                src={currentUser.user_metadata?.avatar_url || undefined}
+                src={currentUser.user_metadata?.avatar_url || 'https://www.gravatar.com/avatar/?d=mp'}
                 alt={currentUser.user_metadata?.full_name || 'User'}
                 className="w-8 h-8 rounded-full"
               />
               <div className="hidden md:block text-sm">
-                {currentUser.user_metadata?.full_name}
+                {currentUser.user_metadata?.full_name || currentUser.email}
               </div>
-              <Button variant="ghost" size="sm" onClick={signOut}>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
                 Sign Out
               </Button>
             </div>
           ) : (
-            <Button onClick={signIn}>
+            <Button onClick={handleNavigateToAuth}>
               Sign in
             </Button>
           )}

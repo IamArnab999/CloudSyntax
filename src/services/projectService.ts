@@ -1,5 +1,5 @@
 
-import { supabase } from '@/lib/firebase';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SaveProjectParams {
   userId: string;

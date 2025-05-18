@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/firebase';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface Project {
   id: string;
@@ -24,6 +25,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
   const [newProjectName, setNewProjectName] = useState('');
   const { currentUser } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProjects();
@@ -63,6 +65,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
         title: "Authentication required",
         description: "Please sign in to create projects",
       });
+      navigate('/auth');
       return;
     }
 
@@ -134,6 +137,14 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
     return (
       <div className="p-4">
         <p className="text-sm text-muted-foreground">Sign in to manage projects</p>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="mt-2" 
+          onClick={() => navigate('/auth')}
+        >
+          Sign in
+        </Button>
       </div>
     );
   }

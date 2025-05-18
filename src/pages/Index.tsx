@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { CodeEditor } from '@/components/CodeEditor';
@@ -11,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface Project {
   id: string;
@@ -30,6 +32,7 @@ const Index = () => {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const { toast } = useToast();
   const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   const handleCodeExecution = async (code: string, language: string) => {
     setIsExecuting(true);
@@ -62,6 +65,7 @@ const Index = () => {
         title: "Authentication required",
         description: "Please sign in to save projects",
       });
+      navigate('/auth');
       return;
     }
 
@@ -75,7 +79,7 @@ const Index = () => {
     }
 
     try {
-      await saveProject({
+      const projectId = await saveProject({
         userId: currentUser.id,
         name: projectName,
         language: currentLanguage,
@@ -89,6 +93,15 @@ const Index = () => {
       });
       setSaveDialogOpen(false);
       setShowSidebar(true); // Show sidebar after saving to see updated list
+      
+      if (!currentProject) {
+        setCurrentProject({
+          id: projectId,
+          name: projectName,
+          language: currentLanguage,
+          code: currentCode
+        });
+      }
     } catch (error) {
       console.error('Error saving project:', error);
       toast({
@@ -114,6 +127,7 @@ const Index = () => {
         title: "Authentication required",
         description: "Please sign in to save projects",
       });
+      navigate('/auth');
       return;
     }
 
