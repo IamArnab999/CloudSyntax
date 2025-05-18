@@ -10,6 +10,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, username: string) => Promise<void>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,12 +19,12 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   signIn: async () => {},
   signUp: async () => {},
-  signOut: async () => {}
+  signOut: async () => {},
+  resetPassword: async () => {}
 });
 
 export const useAuth = () => useContext(AuthContext);
 
-// Helper function to clean up auth state
 const cleanupAuthState = () => {
   localStorage.removeItem('supabase.auth.token');
   Object.keys(localStorage).forEach((key) => {
@@ -81,7 +82,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         await supabase.auth.signOut({ scope: 'global' });
       } catch (err) {
-        // Continue even if this fails
       }
       
       const { error } = await supabase.auth.signInWithPassword({
@@ -117,6 +117,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth?reset=true`,
+      });
+      
+      if (error) throw error;
+      
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     try {
       cleanupAuthState();
@@ -134,7 +148,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     signIn,
     signUp,
-    signOut
+    signOut,
+    resetPassword
   };
 
   return (
