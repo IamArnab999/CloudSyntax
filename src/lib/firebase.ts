@@ -6,8 +6,9 @@ const supabaseUrl = 'https://your-supabase-url.supabase.co';
 const supabaseAnonKey = 'your-supabase-anon-key';
 
 // Initialize Supabase
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export { supabase };
+// Export database client for compatibility with existing code
+export const db = supabase;
 
 // Note: Replace the above config with real Supabase credentials when deploying

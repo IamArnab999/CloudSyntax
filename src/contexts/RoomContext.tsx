@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
@@ -41,7 +40,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // In a real implementation, we would connect to a WebSocket server here
     setRoomId(id);
     setIsConnected(true);
-    setParticipants(prev => [...prev, currentUser?.displayName || 'Anonymous']);
+    setParticipants(prev => [...prev, currentUser?.email || 'Anonymous']);
     
     // Mock implementation for demo purposes
     console.log(`Joined room: ${id}`);

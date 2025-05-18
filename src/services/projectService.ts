@@ -1,6 +1,5 @@
 
-import { collection, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { supabase } from '@/lib/firebase';
 
 interface SaveProjectParams {
   userId: string;
@@ -20,13 +19,17 @@ export const saveProject = async ({
   try {
     if (projectId) {
       // Update existing project
-      const projectRef = doc(db, 'projects', projectId);
-      await updateDoc(projectRef, {
-        name,
-        language,
-        code,
-        updatedAt: new Date(),
-      });
+      const { error } = await supabase
+        .from('projects')
+        .update({
+          name,
+          language,
+          code,
+          updatedAt: new Date().toISOString(),
+        })
+        .eq('id', projectId);
+        
+      if (error) throw error;
       return projectId;
     } else {
       // Create new project
@@ -35,11 +38,17 @@ export const saveProject = async ({
         name,
         language,
         code,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       };
       
-      const docRef = await addDoc(collection(db, 'projects'), projectData);
-      return docRef.id;
+      const { data, error } = await supabase
+        .from('projects')
+        .insert(projectData)
+        .select('id')
+        .single();
+        
+      if (error) throw error;
+      return data.id;
     }
   } catch (error) {
     console.error('Error saving project:', error);
@@ -49,13 +58,18 @@ export const saveProject = async ({
 
 export const getProject = async (projectId: string) => {
   try {
-    const projectRef = doc(db, 'projects', projectId);
-    const projectSnap = await getDoc(projectRef);
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('id', projectId)
+      .single();
+      
+    if (error) throw error;
     
-    if (projectSnap.exists()) {
+    if (data) {
       return {
-        id: projectSnap.id,
-        ...projectSnap.data(),
+        id: data.id,
+        ...data,
       };
     } else {
       throw new Error('Project not found');

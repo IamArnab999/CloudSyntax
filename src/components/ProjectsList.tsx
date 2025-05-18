@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, addDoc, doc, deleteDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { supabase } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,16 +36,16 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
     }
 
     try {
-      const q = query(
-        collection(db, 'projects'),
-        where('userId', '==', currentUser.uid)
-      );
-
-      const querySnapshot = await getDocs(q);
-      const projectsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate() || new Date(),
+      const { data, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('userId', currentUser.id);
+      
+      if (error) throw error;
+      
+      const projectsData = data.map(project => ({
+        ...project,
+        createdAt: new Date(project.createdAt),
       })) as Project[];
 
       setProjects(projectsData.sort((a, b) => 
@@ -81,11 +80,14 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
         name: newProjectName,
         language: 'javascript',
         code: 'console.log("Hello, World!");',
-        userId: currentUser.uid,
-        createdAt: new Date(),
+        userId: currentUser.id,
+        createdAt: new Date().toISOString(),
       };
 
-      await addDoc(collection(db, 'projects'), newProject);
+      const { error } = await supabase.from('projects').insert(newProject);
+      
+      if (error) throw error;
+      
       toast({
         title: "Project created",
         description: `${newProjectName} has been created`,
@@ -106,7 +108,13 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
     e.stopPropagation();
     
     try {
-      await deleteDoc(doc(db, 'projects', id));
+      const { error } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', id);
+        
+      if (error) throw error;
+      
       toast({
         title: "Project deleted",
         description: "The project has been deleted",

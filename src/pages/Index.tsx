@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { CodeEditor } from '@/components/CodeEditor';
@@ -77,7 +76,7 @@ const Index = () => {
 
     try {
       await saveProject({
-        userId: currentUser.uid,
+        userId: currentUser.id,
         name: projectName,
         language: currentLanguage,
         code: currentCode,
