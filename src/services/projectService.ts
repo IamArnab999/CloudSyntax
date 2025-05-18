@@ -1,8 +1,7 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 interface SaveProjectParams {
-  userId: string;
+  userid: string;
   name: string;
   language: string;
   code: string;
@@ -10,7 +9,7 @@ interface SaveProjectParams {
 }
 
 export const saveProject = async ({
-  userId,
+  userid,
   name,
   language,
   code,
@@ -25,7 +24,7 @@ export const saveProject = async ({
           name,
           language,
           code,
-          updatedAt: new Date().toISOString(),
+          updatedat: new Date().toISOString(),
         })
         .eq('id', projectId);
         
@@ -34,11 +33,11 @@ export const saveProject = async ({
     } else {
       // Create new project
       const projectData = {
-        userId,
+        userid,
         name,
         language,
         code,
-        createdAt: new Date().toISOString(),
+        createdat: new Date().toISOString(),
       };
       
       const { data, error } = await supabase

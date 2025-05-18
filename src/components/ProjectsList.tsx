@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,7 +12,7 @@ interface Project {
   name: string;
   language: string;
   code: string;
-  createdAt: Date;
+  createdat: string;
 }
 
 interface ProjectsListProps {
@@ -41,17 +40,17 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
       const { data, error } = await supabase
         .from('projects')
         .select('*')
-        .eq('userId', currentUser.id);
+        .eq('userid', currentUser.id);
       
       if (error) throw error;
       
       const projectsData = data.map(project => ({
         ...project,
-        createdAt: new Date(project.createdAt),
+        createdat: new Date(project.createdat).toISOString(),
       })) as Project[];
 
       setProjects(projectsData.sort((a, b) => 
-        b.createdAt.getTime() - a.createdAt.getTime()
+        new Date(b.createdat).getTime() - new Date(a.createdat).getTime()
       ));
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -83,8 +82,8 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
         name: newProjectName,
         language: 'javascript',
         code: 'console.log("Hello, World!");',
-        userId: currentUser.id,
-        createdAt: new Date().toISOString(),
+        userid: currentUser.id,
+        createdat: new Date().toISOString(),
       };
 
       const { error } = await supabase.from('projects').insert(newProject);
