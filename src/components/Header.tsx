@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,7 +19,6 @@ export const Header: React.FC = () => {
   const navigate = useNavigate();
 
   const handleCreateRoom = () => {
-    // Generate a random room ID
     const randomId = Math.random().toString(36).substring(2, 10);
     joinRoom(randomId);
     setDialogOpen(false);
@@ -60,7 +58,6 @@ export const Header: React.FC = () => {
           )}
         </div>
         <div className="flex items-center gap-2">
-          {/* Theme Toggle Button */}
           <Toggle 
             variant="outline"
             size="sm"
@@ -120,11 +117,11 @@ export const Header: React.FC = () => {
             <div className="flex items-center gap-2">
               <img 
                 src={currentUser.user_metadata?.avatar_url || 'https://www.gravatar.com/avatar/?d=mp'}
-                alt={currentUser.user_metadata?.full_name || 'User'}
+                alt={currentUser.user_metadata?.username || 'User'}
                 className="w-8 h-8 rounded-full"
               />
               <div className="hidden md:block text-sm">
-                {currentUser.user_metadata?.full_name || currentUser.email}
+                {currentUser.user_metadata?.username || 'User'}
               </div>
               <Button variant="ghost" size="sm" onClick={handleSignOut}>
                 Sign Out
