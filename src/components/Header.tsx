@@ -11,7 +11,7 @@ import { Moon, Sun } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 
 export const Header: React.FC = () => {
-  const { currentUser, signInWithGoogle, signOut } = useAuth();
+  const { currentUser, signIn, signOut } = useAuth();
   const { roomId, joinRoom, leaveRoom, isConnected, participants } = useRoom();
   const { theme, toggleTheme } = useTheme();
   const [newRoomId, setNewRoomId] = useState('');
@@ -107,20 +107,20 @@ export const Header: React.FC = () => {
           {currentUser ? (
             <div className="flex items-center gap-2">
               <img 
-                src={currentUser.photoURL || undefined}
-                alt={currentUser.displayName || 'User'}
+                src={currentUser.user_metadata?.avatar_url || undefined}
+                alt={currentUser.user_metadata?.full_name || 'User'}
                 className="w-8 h-8 rounded-full"
               />
               <div className="hidden md:block text-sm">
-                {currentUser.displayName}
+                {currentUser.user_metadata?.full_name}
               </div>
               <Button variant="ghost" size="sm" onClick={signOut}>
                 Sign Out
               </Button>
             </div>
           ) : (
-            <Button onClick={signInWithGoogle}>
-              Sign in with Google
+            <Button onClick={signIn}>
+              Sign in
             </Button>
           )}
         </div>
