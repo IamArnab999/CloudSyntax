@@ -1,4 +1,3 @@
-
 // This is a mock service that simulates code execution
 // In a real application, this would connect to a backend service or API
 
@@ -27,6 +26,16 @@ export const executeCode = async (code: string, language: string): Promise<Execu
         return executeCpp(code);
       case 'csharp':
         return executeCSharp(code);
+      case 'c':
+        return executeC(code);
+      case 'kotlin':
+        return executeKotlin(code);
+      case 'swift':
+        return executeSwift(code);
+      case 'sql':
+        return executeSQL(code);
+      case 'go':
+        return executeGo(code);
       default:
         return {
           output: '',
@@ -164,6 +173,124 @@ const executeCSharp = (code: string): ExecutionResult => {
   
   return {
     output: output || 'No output detected. Make sure you use Console.WriteLine() statements.',
+    error: null,
+    executionTime
+  };
+};
+
+const executeC = (code: string): ExecutionResult => {
+  // Mock C execution
+  const startTime = performance.now();
+  
+  // Look for printf statements
+  let output = '';
+  const printfRegex = /printf\s*\(\s*["'](.+?)\\n?["']\s*(?:,.*?)?\)/g;
+  let match;
+  
+  while ((match = printfRegex.exec(code)) !== null) {
+    output += match[1] + '\\n';
+  }
+  
+  const executionTime = performance.now() - startTime;
+  
+  return {
+    output: output || 'No output detected. Make sure you use printf() statements.',
+    error: null,
+    executionTime
+  };
+};
+
+const executeKotlin = (code: string): ExecutionResult => {
+  // Mock Kotlin execution
+  const startTime = performance.now();
+  
+  // Look for println statements
+  let output = '';
+  const printlnRegex = /println\s*\(\s*["'](.+?)["']\s*\)/g;
+  let match;
+  
+  while ((match = printlnRegex.exec(code)) !== null) {
+    output += match[1] + '\\n';
+  }
+  
+  const executionTime = performance.now() - startTime;
+  
+  return {
+    output: output || 'No output detected. Make sure you use println() statements.',
+    error: null,
+    executionTime
+  };
+};
+
+const executeSwift = (code: string): ExecutionResult => {
+  // Mock Swift execution
+  const startTime = performance.now();
+  
+  // Look for print statements
+  let output = '';
+  const printRegex = /print\s*\(\s*["'](.+?)["']\s*\)/g;
+  let match;
+  
+  while ((match = printRegex.exec(code)) !== null) {
+    output += match[1] + '\\n';
+  }
+  
+  const executionTime = performance.now() - startTime;
+  
+  return {
+    output: output || 'No output detected. Make sure you use print() statements.',
+    error: null,
+    executionTime
+  };
+};
+
+const executeSQL = (code: string): ExecutionResult => {
+  // Mock SQL execution
+  const startTime = performance.now();
+  
+  // Check for SELECT statements
+  let output = '';
+  if (code.toLowerCase().includes('select')) {
+    // Extract what's being selected
+    const selectRegex = /select\s+(.+?)\s+as/i;
+    const match = selectRegex.exec(code);
+    
+    if (match) {
+      const selectedValue = match[1].replace(/['"]/g, '');
+      output = `| ${selectedValue} |\\n-------------\\n`;
+    } else {
+      output = "Query executed successfully. 1 row(s) affected.\\n";
+    }
+  } else {
+    output = "Query executed successfully. 0 row(s) affected.\\n";
+  }
+  
+  const executionTime = performance.now() - startTime;
+  
+  return {
+    output,
+    error: null,
+    executionTime
+  };
+};
+
+const executeGo = (code: string): ExecutionResult => {
+  // Mock Go execution
+  const startTime = performance.now();
+  
+  // Look for fmt.Println statements
+  let output = '';
+  const printlnRegex = /fmt\.Println\s*\(\s*["'](.+?)["']\s*\)/g;
+  let match;
+  
+  while ((match = printlnRegex.exec(code)) !== null) {
+    output += match[1] + '\\n';
+  }
+  
+  const executionTime = performance.now() - startTime;
+  
+  return {
+    output: output || 'No output detected. Make sure you use fmt.Println() statements.',
     error: null,
     executionTime
   };

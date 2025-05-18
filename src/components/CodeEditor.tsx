@@ -16,7 +16,12 @@ const LANGUAGES = [
   { id: 'python', name: 'Python', defaultCode: 'print("Hello, World!")' },
   { id: 'java', name: 'Java', defaultCode: 'public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}' },
   { id: 'cpp', name: 'C++', defaultCode: '#include <iostream>\n\nint main() {\n    std::cout << "Hello, World!" << std::endl;\n    return 0;\n}' },
-  { id: 'csharp', name: 'C#', defaultCode: 'using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hello, World!");\n    }\n}' }
+  { id: 'csharp', name: 'C#', defaultCode: 'using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine("Hello, World!");\n    }\n}' },
+  { id: 'c', name: 'C', defaultCode: '#include <stdio.h>\n\nint main() {\n    printf("Hello, World!\\n");\n    return 0;\n}' },
+  { id: 'kotlin', name: 'Kotlin', defaultCode: 'fun main() {\n    println("Hello, World!")\n}' },
+  { id: 'swift', name: 'Swift', defaultCode: 'import Swift\n\nprint("Hello, World!")' },
+  { id: 'sql', name: 'SQL', defaultCode: 'SELECT "Hello, World!" AS greeting;' },
+  { id: 'go', name: 'Go', defaultCode: 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World!")\n}' }
 ];
 
 export const CodeEditor: React.FC<CodeEditorProps> = ({ onExecute, isExecuting }) => {
