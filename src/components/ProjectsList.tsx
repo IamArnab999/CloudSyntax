@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { getProjects, deleteProject } from '@/services/projectService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,7 +19,7 @@ interface ProjectsListProps {
   onSelectProject: (project: Project) => void;
 }
 
-const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) => {
+export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) => {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
