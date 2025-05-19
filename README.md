@@ -11,12 +11,7 @@ The core purpose of this project is to provide a seamless and intelligent enviro
 *   **Integrated Terminal:** Execute commands and manage your project directly within the environment.
 *   **Code Editor:** A feature-rich code editor with syntax highlighting and other standard IDE features.
 *   **Project Management:** Create, open, and manage multiple projects.
-*   **AI Agents:** Interact with AI agents to assist with coding tasks, such as:
-    *   Generating code snippets.
-    *   Refactoring code.
-    *   Writing documentation.
-    *   Performing file operations (e.g., creating, deleting, modifying files).
-
+   
 ## Project Structure
 
 The project is organized into several key directories and files:
