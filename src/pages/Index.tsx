@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { ProjectsList } from '@/components/ProjectsList';
@@ -55,21 +54,23 @@ const Index = () => {
     }
   };
 
+  const handleBack = () => {
+    setShowSidebar(false);
+  };
+
   return (
     <div className="flex flex-col h-screen">
       <Header />
       
       <div className="flex flex-1 overflow-hidden">
-        {/* Projects Sidebar */}
         <div 
           className={`w-full md:w-64 border-r transition-all duration-300 ${
             showSidebar ? 'translate-x-0' : '-translate-x-full'
           } md:translate-x-0 ${showSidebar ? 'absolute md:relative z-10 bg-background h-[calc(100%-64px)]' : 'hidden md:block'}`}
         >
-          <ProjectsList onSelectProject={onSelectProject} />
+          <ProjectsList onSelectProject={onSelectProject} onBack={handleBack} />
         </div>
         
-        {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden p-2 md:p-4">
           <ProjectHeader 
             projectName={currentProject?.name || 'Untitled Project'} 

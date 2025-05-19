@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Trash2 } from 'lucide-react';
+import { Trash2, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
@@ -17,9 +17,10 @@ interface Project {
 
 interface ProjectsListProps {
   onSelectProject: (project: Project) => void;
+  onBack?: () => void;
 }
 
-export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) => {
+export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject, onBack }) => {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
@@ -69,7 +70,6 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
   };
 
   const handleSelectProject = (project: any) => {
-    // Transform Supabase project format to app's Project format
     const formattedProject: Project = {
       id: project.id,
       name: project.name,
@@ -98,7 +98,14 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
   return (
     <div className="h-full flex flex-col bg-sidebar p-2 md:p-3 overflow-hidden">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">My Projects</h2>
+        <div className="flex items-center gap-2">
+          {onBack && (
+            <Button variant="outline" size="sm" onClick={onBack} className="md:hidden">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          )}
+          <h2 className="text-lg font-semibold">My Projects</h2>
+        </div>
         <Button variant="outline" size="sm" onClick={fetchProjects}>
           Refresh
         </Button>

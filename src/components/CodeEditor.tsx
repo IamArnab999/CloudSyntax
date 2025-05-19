@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { useToast } from '@/components/ui/use-toast';
@@ -37,7 +36,6 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   const { toast } = useToast();
   const { roomId, sendCodeUpdate, receivedCode, receivedLanguage } = useRoom();
 
-  // Initialize with provided initial values or defaults
   useEffect(() => {
     if (initialLanguage) {
       setLanguage(initialLanguage);
@@ -46,7 +44,6 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     if (initialCode) {
       setCode(initialCode);
     } else if (initialLanguage) {
-      // Set default code for the language if no initial code provided
       const langDefault = LANGUAGES.find(lang => lang.id === initialLanguage);
       if (langDefault) {
         setCode(langDefault.defaultCode);
@@ -54,7 +51,6 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     }
   }, [initialCode, initialLanguage]);
 
-  // Update code when receiving new code from room
   useEffect(() => {
     if (receivedCode && receivedLanguage && language === receivedLanguage) {
       setCode(receivedCode);
@@ -65,11 +61,9 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     const selectedLanguage = LANGUAGES.find(lang => lang.id === value);
     if (selectedLanguage) {
       setLanguage(value);
-      // Only set default code if current code is empty or is default from another language
       if (!code.trim() || LANGUAGES.some(lang => lang.defaultCode === code)) {
         setCode(selectedLanguage.defaultCode);
       }
-      // Notify parent about language change
       onExecute(code, value);
     }
   };
@@ -78,7 +72,6 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     if (value !== undefined) {
       setCode(value);
       
-      // If we're in a room, send code updates to other participants
       if (roomId) {
         sendCodeUpdate(value, language);
       }
@@ -99,25 +92,24 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between mb-2 p-2 bg-editor-bg rounded-t-md">
-        <div className="flex items-center gap-2">
-          <Select value={language} onValueChange={handleLanguageChange}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Select language" />
-            </SelectTrigger>
-            <SelectContent>
-              {LANGUAGES.map(lang => (
-                <SelectItem key={lang.id} value={lang.id}>
-                  {lang.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="flex items-center justify-between mb-2 p-2 bg-editor-bg rounded-t-md gap-2">
+        <Select value={language} onValueChange={handleLanguageChange}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Select language" />
+          </SelectTrigger>
+          <SelectContent>
+            {LANGUAGES.map(lang => (
+              <SelectItem key={lang.id} value={lang.id}>
+                {lang.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        
         <Button 
           onClick={handleExecute} 
           disabled={isExecuting}
-          className="bg-green-600 hover:bg-green-700 text-sm px-3 py-1"
+          className="bg-green-600 hover:bg-green-700 text-sm px-3 py-1 whitespace-nowrap"
         >
           {isExecuting ? 'Running...' : 'Run Code'}
         </Button>
