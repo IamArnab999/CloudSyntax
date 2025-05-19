@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Terminal } from '@/components/Terminal';
-import CustomProjectsList from '@/components/CustomProjectsList';
+import ProjectsList from '@/components/ProjectsList';
 import { executeCode } from '@/services/codeExecutionService';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { saveProject } from '@/services/projectService';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -166,7 +166,7 @@ const Index = () => {
             showSidebar ? 'translate-x-0' : '-translate-x-full'
           } md:translate-x-0 ${showSidebar ? 'absolute md:relative z-10 bg-background h-[calc(100%-64px)]' : 'hidden md:block'}`}
         >
-          <CustomProjectsList onSelectProject={handleSelectProject} />
+          <ProjectsList onSelectProject={handleSelectProject} />
         </div>
         
         {/* Main Content */}

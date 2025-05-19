@@ -1,8 +1,4 @@
 
-// Since ProjectsList.tsx is in read-only-files, we'll create a new version
-// and update the imports in Index.tsx to use our new component
-
-<lov-write file_path="src/components/CustomProjectsList.tsx">
 import React, { useState, useEffect } from 'react';
 import { getProjects, deleteProject } from '@/services/projectService';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Trash2 } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 
 interface Project {
@@ -24,7 +20,7 @@ interface ProjectsListProps {
   onSelectProject: (project: Project) => void;
 }
 
-const CustomProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) => {
+const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) => {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
@@ -181,4 +177,4 @@ const CustomProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =>
   );
 };
 
-export default CustomProjectsList;
+export default ProjectsList;
