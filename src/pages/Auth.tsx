@@ -111,7 +111,7 @@ const Auth = () => {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">CodeCompiler</CardTitle>
+          <CardTitle className="text-2xl">CloudSyntax</CardTitle>
           <CardDescription>Sign in or create an account to save your projects</CardDescription>
         </CardHeader>
         <Tabs defaultValue="signin">

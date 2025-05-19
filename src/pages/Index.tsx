@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { ProjectsList } from '@/components/ProjectsList';
 import { CodeWorkspace } from '@/components/CodeWorkspace';
@@ -17,7 +17,9 @@ const Index = () => {
     currentProject,
     projectName,
     setProjectName,
+    currentCode,
     setCurrentCode,
+    currentLanguage,
     setCurrentLanguage,
     saveDialogOpen,
     setSaveDialogOpen,

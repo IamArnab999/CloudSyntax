@@ -9,6 +9,8 @@ import { useRoom } from '@/contexts/RoomContext';
 interface CodeEditorProps {
   onExecute: (code: string, language: string) => void;
   isExecuting: boolean;
+  initialCode?: string;
+  initialLanguage?: string;
 }
 
 const LANGUAGES = [
@@ -24,11 +26,33 @@ const LANGUAGES = [
   { id: 'go', name: 'Go', defaultCode: 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World!")\n}' }
 ];
 
-export const CodeEditor: React.FC<CodeEditorProps> = ({ onExecute, isExecuting }) => {
-  const [language, setLanguage] = useState('javascript');
-  const [code, setCode] = useState(LANGUAGES[0].defaultCode);
+export const CodeEditor: React.FC<CodeEditorProps> = ({ 
+  onExecute, 
+  isExecuting,
+  initialCode,
+  initialLanguage 
+}) => {
+  const [language, setLanguage] = useState(initialLanguage || 'javascript');
+  const [code, setCode] = useState(initialCode || LANGUAGES[0].defaultCode);
   const { toast } = useToast();
   const { roomId, sendCodeUpdate, receivedCode, receivedLanguage } = useRoom();
+
+  // Initialize with provided initial values or defaults
+  useEffect(() => {
+    if (initialLanguage) {
+      setLanguage(initialLanguage);
+    }
+    
+    if (initialCode) {
+      setCode(initialCode);
+    } else if (initialLanguage) {
+      // Set default code for the language if no initial code provided
+      const langDefault = LANGUAGES.find(lang => lang.id === initialLanguage);
+      if (langDefault) {
+        setCode(langDefault.defaultCode);
+      }
+    }
+  }, [initialCode, initialLanguage]);
 
   // Update code when receiving new code from room
   useEffect(() => {
@@ -41,7 +65,12 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ onExecute, isExecuting }
     const selectedLanguage = LANGUAGES.find(lang => lang.id === value);
     if (selectedLanguage) {
       setLanguage(value);
-      setCode(selectedLanguage.defaultCode);
+      // Only set default code if current code is empty or is default from another language
+      if (!code.trim() || LANGUAGES.some(lang => lang.defaultCode === code)) {
+        setCode(selectedLanguage.defaultCode);
+      }
+      // Notify parent about language change
+      onExecute(code, value);
     }
   };
 
@@ -88,7 +117,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ onExecute, isExecuting }
         <Button 
           onClick={handleExecute} 
           disabled={isExecuting}
-          className="bg-green-600 hover:bg-green-700"
+          className="bg-green-600 hover:bg-green-700 text-sm px-3 py-1"
         >
           {isExecuting ? 'Running...' : 'Run Code'}
         </Button>

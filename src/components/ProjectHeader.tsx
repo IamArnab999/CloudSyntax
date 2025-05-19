@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Menu, Save } from 'lucide-react';
+import { X, Menu, Save, ArrowLeft } from 'lucide-react';
 
 interface ProjectHeaderProps {
   projectName: string;
@@ -25,7 +25,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
           className="md:hidden"
           onClick={toggleSidebar}
         >
-          {showSidebar ? <X size={18} /> : <Menu size={18} />}
+          {showSidebar ? <ArrowLeft size={18} /> : <Menu size={18} />}
         </Button>
         <h2 className="text-base md:text-lg font-semibold truncate max-w-[150px] md:max-w-none">
           {projectName || 'Untitled Project'}
