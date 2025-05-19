@@ -1,56 +1,29 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 interface SaveProjectParams {
-  userid: string;
+  userId: string;
   name: string;
   language: string;
   code: string;
   projectId?: string;
 }
 
-export const saveProject = async ({
-  userid,
-  name,
-  language,
-  code,
-  projectId,
-}: SaveProjectParams) => {
+export const getProjects = async (userId: string) => {
   try {
-    if (projectId) {
-      // Update existing project
-      const { error } = await supabase
-        .from('projects')
-        .update({
-          name,
-          language,
-          code,
-          updatedat: new Date().toISOString(),
-        })
-        .eq('id', projectId);
-        
-      if (error) throw error;
-      return projectId;
-    } else {
-      // Create new project
-      const projectData = {
-        userid,
-        name,
-        language,
-        code,
-        createdat: new Date().toISOString(),
-      };
-      
-      const { data, error } = await supabase
-        .from('projects')
-        .insert(projectData)
-        .select('id')
-        .single();
-        
-      if (error) throw error;
-      return data.id;
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('userid', userId)
+      .order('createdat', { ascending: false });
+
+    if (error) {
+      throw error;
     }
+
+    return data;
   } catch (error) {
-    console.error('Error saving project:', error);
+    console.error('Error fetching projects:', error);
     throw error;
   }
 };
@@ -62,19 +35,71 @@ export const getProject = async (projectId: string) => {
       .select('*')
       .eq('id', projectId)
       .single();
-      
-    if (error) throw error;
-    
-    if (data) {
-      return {
-        id: data.id,
-        ...data,
-      };
-    } else {
-      throw new Error('Project not found');
+
+    if (error) {
+      throw error;
     }
+
+    return data;
   } catch (error) {
-    console.error('Error getting project:', error);
+    console.error('Error fetching project:', error);
+    throw error;
+  }
+};
+
+export const saveProject = async ({ userId, name, language, code, projectId }: SaveProjectParams) => {
+  try {
+    let id = projectId;
+
+    if (projectId) {
+      // Update existing project
+      const { error } = await supabase
+        .from('projects')
+        .update({
+          name,
+          language,
+          code,
+          updatedat: new Date().toISOString()
+        })
+        .eq('id', projectId);
+
+      if (error) throw error;
+    } else {
+      // Create new project
+      const { data, error } = await supabase
+        .from('projects')
+        .insert({
+          userid: userId,
+          name,
+          language,
+          code,
+          createdat: new Date().toISOString(),
+          updatedat: new Date().toISOString()
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+      id = data.id;
+    }
+
+    return id;
+  } catch (error) {
+    console.error('Error saving project:', error);
+    throw error;
+  }
+};
+
+export const deleteProject = async (projectId: string) => {
+  try {
+    const { error } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', projectId);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error deleting project:', error);
     throw error;
   }
 };

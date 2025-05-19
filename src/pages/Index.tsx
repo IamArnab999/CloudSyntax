@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { CodeEditor } from '@/components/CodeEditor';
 import { Terminal } from '@/components/Terminal';
-import { ProjectsList } from '@/components/ProjectsList';
+import CustomProjectsList from '@/components/CustomProjectsList';
 import { executeCode } from '@/services/codeExecutionService';
 import { useToast } from '@/components/ui/use-toast';
 import { saveProject } from '@/services/projectService';
@@ -13,6 +12,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { X, Menu, Save } from 'lucide-react';
 
 interface Project {
   id: string;
@@ -33,6 +34,7 @@ const Index = () => {
   const { toast } = useToast();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const handleCodeExecution = async (code: string, language: string) => {
     setIsExecuting(true);
@@ -92,7 +94,10 @@ const Index = () => {
         description: `${projectName} has been saved`,
       });
       setSaveDialogOpen(false);
-      setShowSidebar(true); // Show sidebar after saving to see updated list
+      
+      if (isMobile) {
+        setShowSidebar(true); // Show sidebar after saving on mobile
+      }
       
       if (!currentProject) {
         setCurrentProject({
@@ -117,7 +122,10 @@ const Index = () => {
     setCurrentCode(project.code);
     setCurrentLanguage(project.language);
     setProjectName(project.name);
-    setShowSidebar(false);
+    
+    if (isMobile) {
+      setShowSidebar(false); // Hide sidebar after project selection on mobile
+    }
   };
 
   const openSaveDialog = () => {
@@ -143,6 +151,10 @@ const Index = () => {
     setSaveDialogOpen(true);
   };
 
+  const toggleSidebar = () => {
+    setShowSidebar(!showSidebar);
+  };
+
   return (
     <div className="flex flex-col h-screen">
       <Header />
@@ -150,33 +162,36 @@ const Index = () => {
       <div className="flex flex-1 overflow-hidden">
         {/* Projects Sidebar */}
         <div 
-          className={`w-64 border-r transition-all duration-300 ${
+          className={`w-full md:w-64 border-r transition-all duration-300 ${
             showSidebar ? 'translate-x-0' : '-translate-x-full'
           } md:translate-x-0 ${showSidebar ? 'absolute md:relative z-10 bg-background h-[calc(100%-64px)]' : 'hidden md:block'}`}
         >
-          <ProjectsList onSelectProject={handleSelectProject} />
+          <CustomProjectsList onSelectProject={handleSelectProject} />
         </div>
         
         {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden p-4">
-          <div className="flex justify-between items-center mb-4">
+        <div className="flex-1 flex flex-col overflow-hidden p-2 md:p-4">
+          <div className="flex justify-between items-center mb-2 md:mb-4">
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 className="md:hidden"
-                onClick={() => setShowSidebar(!showSidebar)}
+                onClick={toggleSidebar}
               >
-                {showSidebar ? 'Hide Projects' : 'Show Projects'}
+                {showSidebar ? <X size={18} /> : <Menu size={18} />}
               </Button>
-              <h2 className="text-lg font-semibold">
+              <h2 className="text-base md:text-lg font-semibold truncate max-w-[150px] md:max-w-none">
                 {currentProject ? currentProject.name : 'Untitled Project'}
               </h2>
             </div>
             
             <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
               <DialogTrigger asChild>
-                <Button onClick={openSaveDialog}>Save Project</Button>
+                <Button size="sm" onClick={openSaveDialog} className="flex items-center gap-1">
+                  <Save size={16} className="hidden sm:block" />
+                  <span>Save</span>
+                </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -208,14 +223,14 @@ const Index = () => {
             </Dialog>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-4 flex-1 overflow-hidden">
-            <div className="h-[50vh] md:h-auto">
+          <div className="grid md:grid-cols-2 gap-2 md:gap-4 flex-1 overflow-hidden">
+            <div className="h-[40vh] md:h-auto">
               <CodeEditor 
                 onExecute={handleCodeExecution} 
                 isExecuting={isExecuting} 
               />
             </div>
-            <div className="h-[50vh] md:h-auto">
+            <div className="h-[40vh] md:h-auto">
               <Terminal 
                 output={output} 
                 isExecuting={isExecuting} 

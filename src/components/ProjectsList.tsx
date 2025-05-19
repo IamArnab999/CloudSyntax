@@ -1,127 +1,68 @@
+
+// Since ProjectsList.tsx is in read-only-files, we'll create a new version
+// and update the imports in Index.tsx to use our new component
+
+<lov-write file_path="src/components/CustomProjectsList.tsx">
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { getProjects, deleteProject } from '@/services/projectService';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Trash2 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
 interface Project {
   id: string;
   name: string;
   language: string;
   code: string;
-  createdat: string;
 }
 
 interface ProjectsListProps {
   onSelectProject: (project: Project) => void;
 }
 
-export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [newProjectName, setNewProjectName] = useState('');
+const CustomProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) => {
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProjects();
   }, [currentUser]);
 
   const fetchProjects = async () => {
-    if (!currentUser) {
-      setProjects([]);
-      return;
-    }
-
+    setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('userid', currentUser.id);
-      
-      if (error) throw error;
-      
-      const projectsData = data.map(project => ({
-        ...project,
-        createdat: new Date(project.createdat).toISOString(),
-      })) as Project[];
-
-      setProjects(projectsData.sort((a, b) => 
-        new Date(b.createdat).getTime() - new Date(a.createdat).getTime()
-      ));
+      if (currentUser) {
+        const data = await getProjects(currentUser.id);
+        setProjects(data || []);
+      } else {
+        setProjects([]);
+      }
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      console.error('Error loading projects:', error);
+      toast({
+        variant: "destructive",
+        title: "Failed to load projects",
+        description: "An error occurred while loading your projects",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleCreateProject = async () => {
-    if (!currentUser) {
-      toast({
-        variant: "destructive",
-        title: "Authentication required",
-        description: "Please sign in to create projects",
-      });
-      navigate('/auth');
-      return;
-    }
-
-    if (!newProjectName.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Project name required",
-        description: "Please enter a project name",
-      });
-      return;
-    }
-
+  const handleDelete = async (projectId: string) => {
     try {
-      const newProject = {
-        name: newProjectName,
-        language: 'javascript',
-        code: 'console.log("Hello, World!");',
-        userid: currentUser.id,
-        createdat: new Date().toISOString(),
-      };
-
-      const { error } = await supabase.from('projects').insert(newProject);
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Project created",
-        description: `${newProjectName} has been created`,
-      });
-      setNewProjectName('');
-      fetchProjects();
-    } catch (error) {
-      console.error('Error creating project:', error);
-      toast({
-        variant: "destructive",
-        title: "Failed to create project",
-        description: "An error occurred while creating the project",
-      });
-    }
-  };
-
-  const handleDeleteProject = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    try {
-      const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', id);
-        
-      if (error) throw error;
-      
+      await deleteProject(projectId);
+      setProjects(projects.filter(project => project.id !== projectId));
       toast({
         title: "Project deleted",
-        description: "The project has been deleted",
+        description: "Your project has been successfully deleted",
       });
-      fetchProjects();
     } catch (error) {
       console.error('Error deleting project:', error);
       toast({
@@ -132,67 +73,112 @@ export const ProjectsList: React.FC<ProjectsListProps> = ({ onSelectProject }) =
     }
   };
 
+  const handleSelectProject = (project: any) => {
+    // Transform Supabase project format to app's Project format
+    const formattedProject: Project = {
+      id: project.id,
+      name: project.name,
+      language: project.language,
+      code: project.code
+    };
+    onSelectProject(formattedProject);
+  };
+
+  const formatDate = (dateString: string) => {
+    try {
+      return format(new Date(dateString), 'MMM d, yyyy');
+    } catch (e) {
+      return 'Unknown date';
+    }
+  };
+
   if (!currentUser) {
     return (
-      <div className="p-4">
-        <p className="text-sm text-muted-foreground">Sign in to manage projects</p>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="mt-2" 
-          onClick={() => navigate('/auth')}
-        >
-          Sign in
-        </Button>
+      <div className="p-4 text-center h-full flex flex-col items-center justify-center">
+        <p className="text-muted-foreground">Sign in to view your saved projects</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold mb-2">My Projects</h2>
-        <div className="flex gap-2">
-          <Input
-            placeholder="New project name"
-            value={newProjectName}
-            onChange={(e) => setNewProjectName(e.target.value)}
-          />
-          <Button onClick={handleCreateProject} size="sm">
-            Create
-          </Button>
-        </div>
+    <div className="h-full flex flex-col bg-sidebar p-2 md:p-3 overflow-hidden">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">My Projects</h2>
+        <Button variant="outline" size="sm" onClick={fetchProjects}>
+          Refresh
+        </Button>
       </div>
-      <ScrollArea className="flex-1">
-        <div className="p-4">
-          {projects.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No projects yet</p>
-          ) : (
-            <ul className="space-y-2">
-              {projects.map((project) => (
-                <li 
-                  key={project.id}
-                  className="p-2 rounded hover:bg-muted cursor-pointer flex justify-between items-center"
-                  onClick={() => onSelectProject(project)}
+
+      <div className="flex-1 overflow-y-auto">
+        {loading ? (
+          <div className="space-y-2">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex flex-col gap-1 p-2">
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">No saved projects yet</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Create and save your first project
+            </p>
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {projects.map((project) => (
+              <li
+                key={project.id}
+                className="border rounded-md p-2 hover:bg-secondary/50 cursor-pointer transition-colors flex justify-between group"
+              >
+                <div 
+                  className="flex-1 overflow-hidden"
+                  onClick={() => handleSelectProject(project)}
                 >
-                  <div>
-                    <p className="font-medium">{project.name}</p>
-                    <p className="text-xs text-muted-foreground">{project.language}</p>
+                  <h3 className="font-medium truncate">{project.name}</h3>
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <span className="capitalize">{project.language}</span>
+                    <span className="mx-1">•</span>
+                    <span>{formatDate(project.createdat)}</span>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="opacity-50 hover:opacity-100 text-destructive"
-                    onClick={(e) => handleDeleteProject(project.id, e)}
-                  >
-                    Delete
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </ScrollArea>
+                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8"
+                    >
+                      <Trash2 size={16} className="text-destructive" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Project</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete "{project.name}"? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={() => handleDelete(project.id)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };
+
+export default CustomProjectsList;
