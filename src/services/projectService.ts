@@ -14,8 +14,8 @@ export const getProjects = async (userId: string) => {
     const { data, error } = await supabase
       .from('projects')
       .select('*')
-      .eq('userId', userId)
-      .order('createdAt', { ascending: false });
+      .eq('userid', userId)  // Using lowercase 'userid' to match the database column
+      .order('createdat', { ascending: false });
 
     if (error) {
       throw error;
@@ -59,7 +59,7 @@ export const saveProject = async ({ userId, name, language, code, projectId }: S
           name,
           language,
           code,
-          updatedAt: new Date().toISOString()
+          updatedat: new Date().toISOString() // Using lowercase 'updatedat' to match the database column
         })
         .eq('id', projectId);
 
@@ -69,12 +69,12 @@ export const saveProject = async ({ userId, name, language, code, projectId }: S
       const { data, error } = await supabase
         .from('projects')
         .insert({
-          userId: userId,
+          userid: userId, // Using lowercase 'userid' to match the database column
           name,
           language,
           code,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdat: new Date().toISOString(), // Using lowercase 'createdat' to match the database column
+          updatedat: new Date().toISOString() // Using lowercase 'updatedat' to match the database column
         })
         .select('id')
         .single();
