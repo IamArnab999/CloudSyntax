@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Loader } from 'lucide-react';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -161,7 +162,14 @@ const Auth = () => {
               </CardContent>
               <CardFooter>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Signing In...' : 'Sign In'}
+                  {loading ? (
+                    <>
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      Signing In...
+                    </>
+                  ) : (
+                    'Sign In'
+                  )}
                 </Button>
               </CardFooter>
             </form>
@@ -214,7 +222,14 @@ const Auth = () => {
               </CardContent>
               <CardFooter>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Signing Up...' : 'Sign Up'}
+                  {loading ? (
+                    <>
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      Signing Up...
+                    </>
+                  ) : (
+                    'Sign Up'
+                  )}
                 </Button>
               </CardFooter>
             </form>
@@ -249,7 +264,14 @@ const Auth = () => {
                 Cancel
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? 'Sending...' : 'Send Reset Link'}
+                {loading ? (
+                  <>
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  'Send Reset Link'
+                )}
               </Button>
             </DialogFooter>
           </form>

@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { Loader } from 'lucide-react';
 
 interface UserProfileProps {
   onSignOut?: () => void;
@@ -11,9 +12,12 @@ interface UserProfileProps {
 export const UserProfile: React.FC<UserProfileProps> = ({ onSignOut }) => {
   const { currentUser, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSignOut = async () => {
+    setIsLoading(true);
     await signOut();
+    setIsLoading(false);
     if (onSignOut) onSignOut();
   };
 
@@ -39,8 +43,20 @@ export const UserProfile: React.FC<UserProfileProps> = ({ onSignOut }) => {
       <div className="hidden lg:block text-sm">
         {currentUser.user_metadata?.username || 'User'}
       </div>
-      <Button variant="ghost" size="sm" onClick={handleSignOut}>
-        Sign Out
+      <Button 
+        variant="ghost" 
+        size="sm" 
+        onClick={handleSignOut} 
+        disabled={isLoading}
+      >
+        {isLoading ? (
+          <>
+            <Loader className="mr-2 h-4 w-4 animate-spin" />
+            Signing out...
+          </>
+        ) : (
+          'Sign Out'
+        )}
       </Button>
     </div>
   );

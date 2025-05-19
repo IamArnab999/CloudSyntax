@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Loader } from 'lucide-react';
 import { useRoom } from '@/contexts/RoomContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -18,9 +18,12 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ onClose, onOpenCollabora
   const { roomId, leaveRoom, isConnected, participants } = useRoom();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSignOut = async () => {
+    setIsLoading(true);
     await signOut();
+    setIsLoading(false);
     onClose();
   };
 
@@ -98,8 +101,16 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ onClose, onOpenCollabora
               variant="ghost" 
               size="sm" 
               onClick={handleSignOut}
+              disabled={isLoading}
             >
-              Sign Out
+              {isLoading ? (
+                <>
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  Signing Out...
+                </>
+              ) : (
+                'Sign Out'
+              )}
             </Button>
           </div>
         ) : (
